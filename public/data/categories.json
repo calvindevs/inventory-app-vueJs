@@ -1,14 +1,17 @@
 [
   {
     "id": 1,
-    "name": "Electronics"
+    "name": "Electronics",
+    "description": "test"
   },
   {
     "id": 2,
-    "name": "Accessories"
+    "name": "Accessories",
+    "description": "test"
   },
   {
     "id": 3,
-    "name": "Office Supplies"
+    "name": "Office Supplies",
+    "description": "test"
   }
 ]
