@@ -6,7 +6,7 @@ const stockStore = useStockStore();
 const productWithCategory = computed(() => {
   return stockStore.products.map((product) => {
     const category = stockStore.categories.find((category) => {
-      category.id === product.category_id;
+      return category.id === product.category_id;
     });
 
     return {
@@ -34,7 +34,7 @@ onMounted(() => {
     >
       <table class="w-full text-sm text-left rtl:text-right text-body">
         <thead
-          class="text-sm text-body bg-slate-900 border-b rounded-base border-default"
+          class="text-sm text-body bg-slate-800 border-b rounded-base border-default"
         >
           <tr>
             <th scope="col" class="px-6 py-3 font-medium text-white">#</th>
