@@ -1,8 +1,12 @@
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useStockStore } from "../stores/stockStore.js";
+import ProductCreateModal from "../components/ProductCreateModal.vue";
 
 const stockStore = useStockStore();
+
+const isModalOpen = ref(false);
+
 const productWithCategory = computed(() => {
   return stockStore.products.map((product) => {
     const category = stockStore.categories.find((category) => {
@@ -21,14 +25,24 @@ onMounted(() => {
 </script>
 <template>
   <div class="p-6">
-    <h1 class="text-3xl font-bold mb-4 text-slate-600">Product Management</h1>
-    <div v-if="stockStore.loading" class="text-slate-500">Memuat Data...</div>
-    <div
-      v-else-if="stockStore.error"
-      class="text-red-500 bg-red-50 p-4 rounded-lg"
-    >
-      {{ stockStore.error }}
+    <div class="flex justify-between">
+      <h1 class="text-3xl font-bold mb-4 text-slate-600">Product Management</h1>
+      <div v-if="stockStore.loading" class="text-slate-500">Memuat Data...</div>
+      <div
+        v-else-if="stockStore.error"
+        class="text-red-500 bg-red-50 p-4 rounded-lg"
+      >
+        {{ stockStore.error }}
+      </div>
+
+      <button
+        @click="isModalOpen = true"
+        class="bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition mb-4"
+      >
+        + Tambah Produk
+      </button>
     </div>
+    <ProductCreateModal :is-open="isModalOpen" @close="isModalOpen = false" />
     <div
       class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-lg border border-default"
     >
