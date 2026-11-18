@@ -9,18 +9,33 @@ const stockStore = useStockStore();
 const isModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const selectedProduct = ref(null);
+const selectedCategory = ref("all");
+const keyword = ref("");
 
-const productWithCategory = computed(() => {
-  return stockStore.products.map((product) => {
-    const category = stockStore.categories.find((category) => {
-      return category.id === product.category_id;
+const searchValue = computed(() => {
+  return stockStore.products
+    .map((product) => {
+      const category = stockStore.categories.find((category) => {
+        return category.id === product.category_id;
+      });
+
+      return {
+        ...product,
+        category_name: category ? category.name : "Unknown Category",
+      };
+    })
+    .filter((product) => {
+      const search = keyword.value.toLowerCase();
+      const matchesSearch =
+        product.name.toLowerCase().includes(search) ||
+        product.category_name.toLowerCase().includes(search) ||
+        String(product.price).includes(search) ||
+        String(product.stock).includes(search);
+      const matchedCategory =
+        selectedCategory.value === "all" ||
+        product.category_id === Number(selectedCategory.value);
+      return matchesSearch && matchedCategory;
     });
-
-    return {
-      ...product,
-      category_name: category ? category.name : "Unknown Category",
-    };
-  });
 });
 
 function openEditModal(product) {
@@ -57,6 +72,31 @@ onMounted(() => {
         + Tambah Produk
       </button>
     </div>
+
+    <div class="mb-3">
+      <input
+        type="search"
+        id="search"
+        class="w-4xl px-3 py-3 bg-blue-50 border text-lg text-sm rounded-lg focus:ring-blue-500 mr-4"
+        placeholder="Search"
+        required
+        v-model="keyword"
+      />
+      <select
+        class="border px-3 py-3 rounded-lg bg-blue-50"
+        v-model="selectedCategory"
+      >
+        <option value="all">All Categories</option>
+        <option
+          v-for="category in stockStore.categories"
+          :key="category.id"
+          :value="category.id"
+        >
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+
     <ProductCreateModal :is-open="isModalOpen" @close="isModalOpen = false" />
     <div
       class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-lg border border-default"
@@ -81,7 +121,7 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr
-            v-for="(product, index) in productWithCategory"
+            v-for="(product, index) in searchValue"
             :key="product.id"
             class="bg-slate-200 border-b border-default"
           >
