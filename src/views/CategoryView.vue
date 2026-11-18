@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStockStore } from "../stores/stockStore.js";
 import CategoryCreateModal from "../components/CategoryCreateModal.vue";
 import CategoryEditModal from "../components/CategoryEditModal.vue";
@@ -9,6 +9,14 @@ const stockStore = useStockStore();
 const isModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const selectedCategory = ref(null);
+const keyword = ref("");
+
+const searchValue = computed(() => {
+  return stockStore.categories.filter((category) => {
+    const search = keyword.value.toLowerCase();
+    return category.name.toLowerCase().includes(search);
+  });
+});
 
 function openEditModal(category) {
   selectedCategory.value = category;
@@ -45,6 +53,18 @@ onMounted(() => {
         Add Category
       </button>
     </div>
+
+    <div class="mb-3">
+      <input
+        type="search"
+        id="search"
+        class="w-4xl px-3 py-3 bg-blue-50 border text-lg text-sm rounded-lg focus:ring-blue-500 mr-4"
+        placeholder="Search"
+        required
+        v-model="keyword"
+      />
+    </div>
+
     <CategoryCreateModal :is-open="isModalOpen" @close="isModalOpen = false" />
     <div
       class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-lg border border-default"
@@ -66,7 +86,7 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr
-            v-for="(category, index) in stockStore.categories"
+            v-for="(category, index) in searchValue"
             :key="category.id"
             class="bg-slate-200 border-b border-default"
           >
