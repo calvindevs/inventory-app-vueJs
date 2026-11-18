@@ -2,10 +2,13 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import { useStockStore } from "../stores/stockStore.js";
 import ProductCreateModal from "../components/ProductCreateModal.vue";
+import ProductEditModal from "../components/ProductEditModal.vue";
 
 const stockStore = useStockStore();
 
 const isModalOpen = ref(false);
+const isEditModalOpen = ref(false);
+const selectedProduct = ref(null);
 
 const productWithCategory = computed(() => {
   return stockStore.products.map((product) => {
@@ -19,6 +22,18 @@ const productWithCategory = computed(() => {
     };
   });
 });
+
+function openEditModal(product) {
+  selectedProduct.value = product;
+  isEditModalOpen.value = true;
+}
+
+const handleDelete = (id, name) => {
+  if (confirm(`Yakin ingin menghapus ${name}`)) {
+    stockStore.deleteProduct(id);
+  }
+};
+
 onMounted(() => {
   stockStore.fetchData();
 });
@@ -37,7 +52,7 @@ onMounted(() => {
 
       <button
         @click="isModalOpen = true"
-        class="bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition mb-4"
+        class="bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 px-4 rounded-lg text-sm transition mb-4"
       >
         + Tambah Produk
       </button>
@@ -61,6 +76,7 @@ onMounted(() => {
             </th>
             <th scope="col" class="px-6 py-3 font-medium text-white">PRICE</th>
             <th scope="col" class="px-6 py-3 font-medium text-white">STOCK</th>
+            <th scope="col" class="px-6 py-3 font-medium text-white">ACTION</th>
           </tr>
         </thead>
         <tbody>
@@ -80,9 +96,28 @@ onMounted(() => {
             <td class="px-6 py-4">{{ product.category_name }}</td>
             <td class="px-6 py-4">{{ product.price }}</td>
             <td class="px-6 py-4">{{ product.stock }}</td>
+            <td class="px-6 py-4">
+              <button
+                @click="openEditModal(product)"
+                class="bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg mr-2"
+              >
+                Edit
+              </button>
+              <button
+                @click="handleDelete(product.id, product.name)"
+                class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+              >
+                Delete
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
+      <ProductEditModal
+        :is-open="isEditModalOpen"
+        :product="selectedProduct"
+        @close="isEditModalOpen = false"
+      />
     </div>
   </div>
 </template>

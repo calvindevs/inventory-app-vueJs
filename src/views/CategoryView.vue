@@ -2,10 +2,24 @@
 import { onMounted, ref } from "vue";
 import { useStockStore } from "../stores/stockStore.js";
 import CategoryCreateModal from "../components/CategoryCreateModal.vue";
+import CategoryEditModal from "../components/CategoryEditModal.vue";
 
 const stockStore = useStockStore();
 
 const isModalOpen = ref(false);
+const isEditModalOpen = ref(false);
+const selectedCategory = ref(null);
+
+function openEditModal(category) {
+  selectedCategory.value = category;
+  isEditModalOpen.value = true;
+}
+
+const handleDelete = (id, name) => {
+  if (confirm(`Yakin menghapus kategori ${name}`)) {
+    stockStore.deleteCategory(id);
+  }
+};
 
 onMounted(() => {
   stockStore.fetchData();
@@ -64,10 +78,28 @@ onMounted(() => {
             </th>
             <td class="px-6 py-4">{{ category.name }}</td>
             <td class="px-6 py-4">{{ category.description }}</td>
-            <td class="px-6 py-4"></td>
+            <td class="px-6 py-4">
+              <button
+                @click="openEditModal(category)"
+                class="bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg mr-2"
+              >
+                Edit
+              </button>
+              <button
+                @click="handleDelete(category.id, category.name)"
+                class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+              >
+                Delete
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
+      <CategoryEditModal
+        :is-open="isEditModalOpen"
+        :category="selectedCategory"
+        @close="isEditModalOpen = false"
+      />
     </div>
   </div>
 </template>
