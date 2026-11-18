@@ -56,5 +56,47 @@ export const useStockStore = defineStore("stock", {
       this.categories.push(categoryWithId);
       localStorage.setItem("categories", JSON.stringify(this.categories));
     },
+
+    updateProduct(id, updatedData) {
+      this.products = this.products.map((product) => {
+        if (product.id === id) {
+          return {
+            ...product,
+            ...updatedData,
+          };
+        }
+
+        return product;
+      });
+
+      localStorage.setItem("products", JSON.stringify(this.products));
+    },
+
+    deleteProduct(id) {
+      this.products = this.products.filter((product) => product.id !== id);
+
+      localStorage.setItem("products", JSON.stringify(this.products));
+    },
+
+    updateCategory(id, updatedData) {
+      this.categories = this.categories.map((category) => {
+        if (category.id === id) {
+          return {
+            ...category,
+            ...updatedData,
+          };
+        }
+        return category;
+      });
+
+      localStorage.setItem("categories", JSON.stringify(this.categories));
+    },
+
+    deleteCategory(id) {
+      this.categories = this.categories.filter(
+        (category) => category.id !== id,
+      );
+      localStorage.setItem("categories", JSON.stringify(this.categories));
+    },
   },
 });
